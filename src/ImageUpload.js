@@ -1,4 +1,4 @@
-import React, { useCallback, useRef, useState } from 'react';
+import React, { useRef, useState } from 'react';
 import imglyRemoveBackground from "@imgly/background-removal";
 function ImageUpload() {
   const [images, setImages] = useState([]);
@@ -17,13 +17,29 @@ function ImageUpload() {
          Array.from(ref.current.files).map( async(e)=>{
           
           const blob = await imglyRemoveBackground(e)
+          console.log(e);
+          console.log(blob);
           const url = URL.createObjectURL(blob);
-          setImages([...images, {name: 'hi',url:url}]);
-          console.log(images);
+          setImages([...images, {name: e.name, url:url}]);
         })
       }
     }
+
   })
+  const handleImageDowload = ()=>{
+    if (images.length > 0) {
+      images.map((image)=>{
+        const download = document.createElement("a")
+        download.setAttribute('download',image.name)
+        download.setAttribute('disable', true)
+        download.href = image.url
+        document.body.appendChild(download)
+        download.click();
+        document.body.removeChild(download)
+      })
+
+    }
+  }
   return (
     <div>
       <div className="row mt-4">
@@ -31,7 +47,7 @@ function ImageUpload() {
           <form>
             <div className="form-group">
               <label htmlFor="fileInput">Select a File: </label>
-              <input ref={ref}  multiple id="fileInput" className="form-control"
+              <input ref={ref}  id="fileInput" className="form-control"
                 type="file" />
             </div>
             <input className="btn btn-primary m-1"
@@ -40,7 +56,7 @@ function ImageUpload() {
           </form>
 
           <button className="btn btn-warning"
-            onClick={handleImageUpload}>
+            onClick={handleImageDowload}>
             Download
           </button>
           <div className="row">
@@ -50,10 +66,10 @@ function ImageUpload() {
                         <th>Image</th>
                     </tr>
                     {
-                      images && images.map((i,image)=>{
-                        console.log(image);
+                      images && images.map((image,i)=>{
+                        console.log(images);
                         return(
-                          <tr key={i}>
+                          <tr key={image}>
                         <td>{image.name}</td>
                         <td><img style={{width: 50, height: 50}} src={image.url} alt=""/></td>
                     </tr>
